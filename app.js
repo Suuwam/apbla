@@ -1,4 +1,4 @@
-// AI Chat System - Main Application JavaScript
+// Jyotisha - Main Application JavaScript
 
 class AIChat {
     constructor() {
@@ -690,7 +690,7 @@ class AIChat {
             this.messagesContainer.innerHTML = `
                 <div class="welcome-message">
                     <img src="logo.png" alt="Logo" class="welcome-logo">
-                    <h2>Welcome to AI Chat</h2>
+                    <h2>Welcome to Jyotisha</h2>
                     <p>Configure your local LLM endpoint in settings and start chatting!</p>
                     <div class="quick-actions">
                         <button class="quick-action" data-prompt="Explain quantum computing in simple terms">

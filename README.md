@@ -1,8 +1,8 @@
-# AI Chat System
+# Jyotisha
 
-A complete AI chat system frontend that allows you to connect to your local LLM (Large Language Model) server.
+A complete chat system frontend that allows you to connect to your local LLM (Large Language Model) server.
 
-![AI Chat Screenshot](https://github.com/user-attachments/assets/b06d4328-65ad-41b8-9610-8f05e6b16ac5)
+![Jyotisha Screenshot](https://github.com/user-attachments/assets/b06d4328-65ad-41b8-9610-8f05e6b16ac5)
 
 ## Features
 
