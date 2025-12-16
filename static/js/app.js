@@ -1,5 +1,8 @@
 // Jyotisha - Main Application JavaScript
 
+// Get logo path from window or use default
+const LOGO_PATH = window.LOGO_PATH || 'logo.png';
+
 class AIChat {
     constructor() {
         // DOM Elements
@@ -629,7 +632,7 @@ class AIChat {
         } else {
             messageEl.innerHTML = `
                 <div class="message-avatar">
-                    <img src="logo.png" alt="AI">
+                    <img src="${LOGO_PATH}" alt="AI">
                 </div>
                 <div class="message-content">
                     <div class="message-bubble">${this.formatMessage(content)}</div>
@@ -647,7 +650,7 @@ class AIChat {
         typingEl.className = 'message assistant';
         typingEl.innerHTML = `
             <div class="message-avatar">
-                <img src="logo.png" alt="AI">
+                <img src="${LOGO_PATH}" alt="AI">
             </div>
             <div class="message-content">
                 <div class="message-bubble">
@@ -689,7 +692,7 @@ class AIChat {
         if (!this.messagesContainer.querySelector('.welcome-message')) {
             this.messagesContainer.innerHTML = `
                 <div class="welcome-message">
-                    <img src="logo.png" alt="Logo" class="welcome-logo">
+                    <img src="${LOGO_PATH}" alt="Logo" class="welcome-logo">
                     <h2>Welcome to Jyotisha</h2>
                     <p>Configure your local LLM endpoint in settings and start chatting!</p>
                     <div class="quick-actions">

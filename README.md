@@ -1,6 +1,6 @@
 # Jyotisha
 
-A complete chat system frontend that allows you to connect to your local LLM (Large Language Model) server.
+A Flask-based AI chat system that allows you to connect to your local LLM (Large Language Model) server.
 
 ![Jyotisha Screenshot](https://github.com/user-attachments/assets/b06d4328-65ad-41b8-9610-8f05e6b16ac5)
 
@@ -14,31 +14,43 @@ A complete chat system frontend that allows you to connect to your local LLM (La
 - 🔧 **Multiple API Formats** - Support for Ollama, OpenAI-compatible, and custom APIs
 - 🎛️ **Generation Parameters** - Adjust temperature, max tokens, and system prompts
 - ⚡ **Quick Actions** - Pre-defined prompts for quick interactions
+- 🐍 **Flask Backend** - Python-based backend with API proxy support
 
 ## Getting Started
 
 ### Prerequisites
 
-You need a local LLM server running. Popular options include:
+- Python 3.8+
+- A local LLM server running. Popular options include:
+  - [Ollama](https://ollama.ai/) - Easy to use, runs models like Llama 2, Mistral, etc.
+  - [LM Studio](https://lmstudio.ai/) - GUI for running local LLMs
+  - Any OpenAI-compatible API server
 
-- [Ollama](https://ollama.ai/) - Easy to use, runs models like Llama 2, Mistral, etc.
-- [LM Studio](https://lmstudio.ai/) - GUI for running local LLMs
-- Any OpenAI-compatible API server
+### Installation
 
-### Running the Chat Interface
-
-1. Clone this repository
-2. Open `index.html` in your browser, or serve it with a local server:
-
+1. Clone this repository:
 ```bash
-# Using Python
-python3 -m http.server 8080
-
-# Using Node.js
-npx serve
+git clone https://github.com/Suuwam/apbla.git
+cd apbla
 ```
 
-3. Open http://localhost:8080 in your browser
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the Flask application:
+```bash
+python app.py
+```
+
+4. Open http://localhost:5000 in your browser
+
+### Environment Variables
+
+- `PORT` - Server port (default: 5000)
+- `FLASK_DEBUG` - Enable debug mode (default: false)
+- `SECRET_KEY` - Flask secret key (set in production)
 
 ### Configuration
 
@@ -62,6 +74,15 @@ npx serve
 3. Press Enter to send (Shift+Enter for new line)
 4. Use the quick action buttons for common prompts
 
+## API Endpoints
+
+The Flask backend provides the following API endpoints:
+
+- `GET /` - Render the main chat interface
+- `POST /api/chat` - Send messages and get responses from LLM
+- `POST /api/test-connection` - Test connection to LLM server
+- `POST /api/stream` - Stream responses from LLM (Server-Sent Events)
+
 ## Screenshots
 
 ### Main Interface
@@ -76,11 +97,19 @@ npx serve
 ## File Structure
 
 ```
-├── index.html      # Main HTML structure
-├── styles.css      # Styling with dark theme
-├── app.js          # JavaScript application logic
-├── logo.png        # Application logo
-└── README.md       # This file
+├── app.py                  # Flask application
+├── requirements.txt        # Python dependencies
+├── templates/
+│   └── index.html          # Main HTML template
+├── static/
+│   ├── css/
+│   │   └── styles.css      # Styling with dark theme
+│   ├── js/
+│   │   └── app.js          # JavaScript application logic
+│   └── images/
+│       └── logo.png        # Application logo
+├── logo.png                # Application logo (root)
+└── README.md               # This file
 ```
 
 ## Browser Support
