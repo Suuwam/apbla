@@ -444,7 +444,8 @@ class AIChat {
             maxTokens,
             apiKey,
             customRequestTemplate,
-            messages
+            messages,
+            systemPrompt
         });
         
         this.abortController = new AbortController();
@@ -476,7 +477,7 @@ class AIChat {
     }
     
     buildRequest(prompt, model, endpoint, format, options = {}) {
-        const { temperature = 0.7, maxTokens = 2048, apiKey, customRequestTemplate, messages = [] } = options;
+        const { temperature = 0.7, maxTokens = 2048, apiKey, customRequestTemplate, messages = [], systemPrompt } = options;
         
         let url = endpoint;
         let body;
@@ -504,12 +505,14 @@ class AIChat {
             case 'openai':
                 // Convert messages to OpenAI format
                 const openaiMessages = [];
-                if (options.systemPrompt) {
-                    openaiMessages.push({ role: 'system', content: options.systemPrompt });
+                if (systemPrompt) {
+                    openaiMessages.push({ role: 'system', content: systemPrompt });
                 }
-                messages.forEach(msg => {
-                    openaiMessages.push({ role: msg.role, content: msg.content });
-                });
+                if (messages && messages.length > 0) {
+                    messages.forEach(msg => {
+                        openaiMessages.push({ role: msg.role, content: msg.content });
+                    });
+                }
                 
                 body = {
                     model: model,
@@ -522,8 +525,19 @@ class AIChat {
             case 'custom':
                 try {
                     let template = customRequestTemplate || '{"prompt": "{{message}}", "model": "{{model}}"}';
-                    template = template.replace(/\{\{message\}\}/g, JSON.stringify(prompt).slice(1, -1));
-                    template = template.replace(/\{\{model\}\}/g, model);
+                    // Safely escape the prompt for JSON embedding
+                    const escapedPrompt = prompt
+                        .replace(/\\/g, '\\\\')
+                        .replace(/"/g, '\\"')
+                        .replace(/\n/g, '\\n')
+                        .replace(/\r/g, '\\r')
+                        .replace(/\t/g, '\\t');
+                    // Safely escape the model name
+                    const escapedModel = model
+                        .replace(/\\/g, '\\\\')
+                        .replace(/"/g, '\\"');
+                    template = template.replace(/\{\{message\}\}/g, escapedPrompt);
+                    template = template.replace(/\{\{model\}\}/g, escapedModel);
                     body = JSON.parse(template);
                 } catch {
                     throw new Error('Invalid custom request template. Please check your JSON format.');
@@ -717,7 +731,7 @@ class AIChat {
     
     // Utility Functions
     generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 11);
     }
     
     escapeHtml(text) {
