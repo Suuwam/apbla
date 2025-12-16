@@ -14,7 +14,6 @@ class AIChat {
         this.welcomeMessage = document.getElementById('welcomeMessage');
         this.messageInput = document.getElementById('messageInput');
         this.sendBtn = document.getElementById('sendBtn');
-        this.downloadBtn = document.getElementById('downloadBtn');
         
         // Settings Elements
         this.apiEndpointInput = document.getElementById('apiEndpoint');
@@ -72,9 +71,6 @@ class AIChat {
         
         // New chat button
         this.newChatBtn.addEventListener('click', () => this.createNewChat());
-        
-        // Download button
-        this.downloadBtn.addEventListener('click', () => this.downloadAsZip());
         
         // Settings modal
         this.settingsBtn.addEventListener('click', () => this.openSettings());
@@ -764,71 +760,6 @@ class AIChat {
         formatted = formatted.replace(/\n/g, '<br>');
         
         return formatted;
-    }
-    
-    // Download project as ZIP
-    async downloadAsZip() {
-        this.downloadBtn.disabled = true;
-        this.downloadBtn.innerHTML = `
-            <div class="loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
-            Downloading...
-        `;
-        
-        try {
-            const zip = new JSZip();
-            
-            // Fetch all project files
-            const files = [
-                { name: 'index.html', url: 'index.html' },
-                { name: 'styles.css', url: 'styles.css' },
-                { name: 'app.js', url: 'app.js' },
-                { name: 'logo.png', url: 'logo.png' },
-                { name: 'README.md', url: 'README.md' }
-            ];
-            
-            for (const file of files) {
-                try {
-                    const response = await fetch(file.url);
-                    if (response.ok) {
-                        if (file.name.endsWith('.png')) {
-                            const blob = await response.blob();
-                            zip.file(file.name, blob);
-                        } else {
-                            const text = await response.text();
-                            zip.file(file.name, text);
-                        }
-                    }
-                } catch {
-                    console.warn(`Could not fetch ${file.name}`);
-                }
-            }
-            
-            // Generate the ZIP file
-            const content = await zip.generateAsync({ type: 'blob' });
-            
-            // Create download link
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = 'jyotisha.zip';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-            
-        } catch (error) {
-            console.error('Error creating ZIP:', error);
-            alert('Failed to create ZIP file. Please try again.');
-        } finally {
-            this.downloadBtn.disabled = false;
-            this.downloadBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Download ZIP
-            `;
-        }
     }
 }
 
