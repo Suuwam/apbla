@@ -542,8 +542,8 @@ class AIChat {
                     template = template.replace(/\{\{message\}\}/g, escapedPrompt);
                     template = template.replace(/\{\{model\}\}/g, escapedModel);
                     body = JSON.parse(template);
-                } catch {
-                    throw new Error('Invalid custom request template. Please check your JSON format.');
+                } catch (error) {
+                    throw new Error(`Invalid custom request template: ${error.message}`);
                 }
                 break;
                 

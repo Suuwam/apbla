@@ -7,9 +7,15 @@ from flask import Flask, render_template, request, jsonify, Response
 import requests
 import json
 import os
+import secrets
+from urllib.parse import urlparse
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'jyotisha-secret-key-change-in-production')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+
+# Allowed URL schemes and hosts for LLM endpoints
+ALLOWED_SCHEMES = {'http', 'https'}
+ALLOWED_HOSTS = os.environ.get('ALLOWED_LLM_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',')
 
 # Default LLM settings
 DEFAULT_SETTINGS = {
@@ -20,6 +26,28 @@ DEFAULT_SETTINGS = {
     'max_tokens': 2048,
     'system_prompt': ''
 }
+
+
+def validate_endpoint_url(url):
+    """Validate that the LLM endpoint URL is allowed."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ALLOWED_SCHEMES:
+            return False, f"URL scheme '{parsed.scheme}' not allowed. Use http or https."
+        
+        # Extract hostname without port
+        hostname = parsed.hostname or ''
+        
+        # Check if host is in allowed list (or allow all if ALLOW_ALL_HOSTS is set)
+        if os.environ.get('ALLOW_ALL_LLM_HOSTS', 'false').lower() == 'true':
+            return True, None
+        
+        if hostname not in ALLOWED_HOSTS:
+            return False, f"Host '{hostname}' not in allowed hosts. Set ALLOWED_LLM_HOSTS or ALLOW_ALL_LLM_HOSTS=true."
+        
+        return True, None
+    except Exception as e:
+        return False, f"Invalid URL: {str(e)}"
 
 
 @app.route('/')
@@ -125,6 +153,12 @@ def build_prompt(messages, system_prompt=''):
 def get_llm_response(prompt, settings, timeout=60):
     """Get a response from the LLM API."""
     api_endpoint = settings.get('api_endpoint', DEFAULT_SETTINGS['api_endpoint'])
+    
+    # Validate the endpoint URL
+    is_valid, error_msg = validate_endpoint_url(api_endpoint)
+    if not is_valid:
+        raise ValueError(error_msg)
+    
     model_name = settings.get('model_name', DEFAULT_SETTINGS['model_name'])
     api_format = settings.get('api_format', DEFAULT_SETTINGS['api_format'])
     temperature = settings.get('temperature', DEFAULT_SETTINGS['temperature'])
@@ -186,6 +220,12 @@ def get_llm_response(prompt, settings, timeout=60):
 def stream_llm_response(prompt, settings):
     """Stream response from LLM API."""
     api_endpoint = settings.get('api_endpoint', DEFAULT_SETTINGS['api_endpoint'])
+    
+    # Validate the endpoint URL
+    is_valid, error_msg = validate_endpoint_url(api_endpoint)
+    if not is_valid:
+        raise ValueError(error_msg)
+    
     model_name = settings.get('model_name', DEFAULT_SETTINGS['model_name'])
     temperature = settings.get('temperature', DEFAULT_SETTINGS['temperature'])
     max_tokens = settings.get('max_tokens', DEFAULT_SETTINGS['max_tokens'])
